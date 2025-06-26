@@ -50,3 +50,33 @@ James' Q2 2025 explorations of the pico calc
 | 38            | GND               | GND           | -             | -             |                           |
 | 39            | VSYS 5v0          | PICO_VSYS     | -             | -             |                           |
 | 40            | VBUS 5v0          | VBUS          | -             | -             | TOP RIGHT, USB SIDE       |
+
+## Keyboard Interface
+
+It uses I2C, I have no idea what the protocol is yet. I need to find their docs or look through their arduino firmware
+
+Some kind of defines:
+
+- https://github.com/clockworkpi/PicoCalc/blob/ebdc77ad4a78b291b7b34be3d334f90fee3dddf3/Code/picocalc_kbd_tester/keyboard_define.h
+
+Rough functional code here?
+
+- https://github.com/clockworkpi/PicoCalc/blob/master/Code/pico_multi_booter/picomite/picocalc/i2ckbd.c
+
+
+
+## Display Interface
+
+It's some kind of SPI display?
+
+They have the ST7365P doc in their repo: https://github.com/clockworkpi/PicoCalc/blob/master/ST7365P_SPEC_V1.0.pdf
+
+But their LVGL demo has an ILI9488 thing copied into it? https://github.com/clockworkpi/PicoCalc/tree/master/Code/picocalc_lvgl_graphics_demo
+
+It's a 320x320, 16-bit? display
+
+The picomite patch has a lot of interesting information: https://github.com/clockworkpi/PicoCalc/blob/ebdc77ad4a78b291b7b34be3d334f90fee3dddf3/Code/PicoMite/PicoMite.patch#L937
+
+It claims the display type is ILI9488, has some pin mapping, and what appears to be a bunch of I2C and Display setup/operation commands
+
+It also seems to configure the I2C speed to 10khz ??? - https://github.com/clockworkpi/PicoCalc/blob/ebdc77ad4a78b291b7b34be3d334f90fee3dddf3/Code/PicoMite/PicoMite.patch#L976
