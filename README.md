@@ -63,7 +63,7 @@ Rough functional code here?
 
 - https://github.com/clockworkpi/PicoCalc/blob/master/Code/pico_multi_booter/picomite/picocalc/i2ckbd.c
 
-Update: I have some keyboard stuff [working here](./jigs/poststation-rp2040/app/main.rs).
+Update: I have some keyboard stuff [working here](./jigs/poststation-rp2040/app/src/main.rs).
 
 ## Display Interface
 
