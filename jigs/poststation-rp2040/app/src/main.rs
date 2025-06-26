@@ -1,5 +1,4 @@
 use std::{
-    io::{stdout, Write},
     sync::atomic::{AtomicU32, Ordering},
     time::Duration,
 };
@@ -7,7 +6,7 @@ use std::{
 use embedded_hal_async::i2c::{Error, ErrorType, I2c, Operation};
 use picocalc_jig_icd::*;
 use poststation_sdk::{connect, PoststationClient};
-use tokio::time::{interval, sleep};
+use tokio::time::interval;
 
 struct I2cDev {
     serial: u64,
@@ -310,13 +309,11 @@ impl KeyState {
                 Some(self.report(KeyEvent::Release(Key::Char(ch))))
             }
             [a, b] => {
-                if let Some(f) = SPECIALS.iter().find_map(|(idx, k)| {
-                    if b == *idx {
-                        Some(k)
-                    } else {
-                        None
-                    }
-                }) {
+                if let Some(f) =
+                    SPECIALS
+                        .iter()
+                        .find_map(|(idx, k)| if b == *idx { Some(k) } else { None })
+                {
                     match a {
                         1 => Some(self.report(KeyEvent::Press(*f))),
                         2 => Some(self.report(KeyEvent::Hold(*f))),
@@ -331,7 +328,7 @@ impl KeyState {
                         _ => Some(self.report(KeyEvent::Other(data))),
                     }
                 }
-            },
+            }
         }
     }
 }
