@@ -1,5 +1,5 @@
 [package]
-name = "template-icd"
+name = "picocalc-jig-icd"
 version = "0.1.0"
 edition = "2021"
 
@@ -16,7 +16,7 @@ version = "0.2"
 features = ["derive"]
 
 [features]
-use-std = []
+use-std = ["postcard-schema/use-std"]
 
 [profile.ci]
 inherits = "dev"

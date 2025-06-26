@@ -2,7 +2,7 @@ use core::sync::atomic::{compiler_fence, Ordering};
 
 use embassy_time::{Instant, Timer};
 use postcard_rpc::{header::VarHeader, server::Sender};
-use template_icd::{LedState, SleepEndpoint, SleepMillis, SleptMillis};
+use picocalc_jig_icd::*;
 
 use crate::app::{AppTx, Context, TaskContext};
 
@@ -32,6 +32,40 @@ pub fn get_led(context: &mut Context, _header: VarHeader, _arg: ()) -> LedState 
     match context.led.is_set_low() {
         true => LedState::Off,
         false => LedState::On,
+    }
+}
+
+pub async fn i2c_read(context: &mut Context, _header: VarHeader, arg: ReadCommand) -> ReadResult<'_> {
+    let len = arg.len as usize;
+    if len > context.buf.len() {
+        return Err(I2cError)
+    }
+    let Context { sb_i2c, buf, .. } = context;
+    let buf = &mut buf[..len];
+    let res = sb_i2c.read_async(arg.addr, buf).await;
+    match res {
+        Ok(()) => Ok(ReadData { data: buf }),
+        Err(_e) => Err(I2cError),
+    }
+}
+
+pub async fn i2c_write(context: &mut Context, _header: VarHeader, arg: WriteCommand<'_>) -> WriteResult {
+    context.sb_i2c.write_async(arg.addr, arg.data.iter().copied())
+        .await
+        .map_err(|_| I2cError)
+}
+
+pub async fn i2c_write_read<'a>(context: &'a mut Context, _header: VarHeader, arg: WriteReadCommand<'_>) -> ReadResult<'a> {
+    let len = arg.rx_len as usize;
+    if len > context.buf.len() {
+        return Err(I2cError)
+    }
+    let Context { sb_i2c, buf, .. } = context;
+    let buf = &mut buf[..len];
+    let res = sb_i2c.write_read_async(arg.addr, arg.tx_data.iter().copied(), buf).await;
+    match res {
+        Ok(()) => Ok(ReadData { data: buf }),
+        Err(_e) => Err(I2cError),
     }
 }
 

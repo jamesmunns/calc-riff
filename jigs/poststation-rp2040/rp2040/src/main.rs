@@ -4,7 +4,7 @@
 use app::AppTx;
 use defmt::info;
 use embassy_executor::Spawner;
-use embassy_rp::{bind_interrupts, gpio::{Level, Output}, peripherals::USB, usb};
+use embassy_rp::{bind_interrupts, gpio::{Level, Output}, i2c::{self, I2c}, peripherals::{USB, I2C1}, usb};
 use embassy_time::{Duration, Instant, Ticker};
 use embassy_usb::{Config, UsbDevice};
 use postcard_rpc::{sender_fmt, server::{Dispatch, Sender, Server}};
@@ -12,6 +12,7 @@ use static_cell::StaticCell;
 
 bind_interrupts!(pub struct Irqs {
     USBCTRL_IRQ => usb::InterruptHandler<USB>;
+    I2C1_IRQ => i2c::InterruptHandler<I2C1>;
 });
 
 use {defmt_rtt as _, panic_probe as _};
@@ -63,6 +64,34 @@ async fn main(spawner: Spawner) {
         });
     let ser_buf = SERIAL_STRING.init(ser_buf);
     let ser_buf = core::str::from_utf8(ser_buf.as_slice()).unwrap();
+    //
+    // PicoCalc Hardware
+    //
+
+    // PSRAM
+    // ...
+
+    // DBG UART
+    // ...
+
+    // SOUTHBRIDGE UART
+    // ...
+
+    // SOUTHBRIDGE I2C
+    // ...
+    let mut cfg = i2c::Config::default();
+    cfg.frequency = 10_000; // The docs say this (slow) speed is important
+    let sb_i2c = I2c::new_async(p.I2C1, p.PIN_7, p.PIN_6, Irqs, cfg);
+
+    // LCD
+    // ...
+
+    // SDCARD
+    // ...
+
+    // SOUND
+    // ...
+
 
     // USB/RPC INIT
     let driver = usb::Driver::new(p.USB, Irqs);
@@ -70,7 +99,7 @@ async fn main(spawner: Spawner) {
     let config = usb_config(ser_buf);
     let led = Output::new(p.PIN_25, Level::Low);
 
-    let context = app::Context { unique_id, led };
+    let context = app::Context { unique_id, led, sb_i2c, buf: [0u8; 256] };
 
     let (device, tx_impl, rx_impl) = app::STORAGE.init_poststation(driver, config, pbufs.tx_buf.as_mut_slice());
     let dispatcher = app::MyApp::new(context, spawner.into());

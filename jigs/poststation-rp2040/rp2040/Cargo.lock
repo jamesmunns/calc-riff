@@ -962,6 +962,15 @@ dependencies = [
 ]
 
 [[package]]
+name = "picocalc-jig-icd"
+version = "0.1.0"
+dependencies = [
+ "postcard-rpc",
+ "postcard-schema",
+ "serde",
+]
+
+[[package]]
 name = "pin-project-lite"
 version = "0.2.16"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -1415,15 +1424,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "template-icd"
-version = "0.1.0"
-dependencies = [
- "postcard-rpc",
- "postcard-schema",
- "serde",
-]
-
-[[package]]
 name = "template-rp2040"
 version = "0.1.0"
 dependencies = [
@@ -1437,12 +1437,12 @@ dependencies = [
  "embassy-time",
  "embassy-usb",
  "panic-probe",
+ "picocalc-jig-icd",
  "portable-atomic",
  "postcard",
  "postcard-rpc",
  "postcard-schema",
  "static_cell",
- "template-icd",
 ]
 
 [[package]]
